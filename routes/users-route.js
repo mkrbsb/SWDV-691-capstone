@@ -4,7 +4,7 @@ const router = express.Router()
 const {getAll, getOne, create, update, deleteOne} = require('../controller/users-controller')
 
 
-router.get("/users", getOne)
+router.get("/users", getAll)
 
 router.get("/users/:userId", getOne)
 
