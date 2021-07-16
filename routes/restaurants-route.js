@@ -8,9 +8,12 @@ const {
   dislike,
   like,
   deleteOne,
+  LandingPage,
 } = require("../controller/restaurants-controller");
 
 router.get("/restaurants", getAll);
+
+router.get("/restaurants/landingpage/:city", LandingPage);
 
 router.get("/restaurants/:restaurantId", getOne);
 

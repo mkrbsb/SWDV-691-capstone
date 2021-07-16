@@ -3,11 +3,12 @@ const fetch = require("node-fetch");
 require("dotenv").config();
 
 module.exports.getAll = async (req, res) => {
+  const { city } = req.query.city;
   const arr = ["one", "two", "three", "four"];
   const results = await Promise.all(
     arr.map(async (num, idx) => {
       const res = await fetch(
-        `https://api.yelp.com/v3/businesses/search?location=" + "austin" + "&price=${
+        `https://api.yelp.com/v3/businesses/search?location=" + "${city}" + "&price=${
           idx + 1
         }&limit=50`,
         {
@@ -25,6 +26,25 @@ module.exports.getAll = async (req, res) => {
     })
   );
   res.json(results);
+};
+
+module.exports.LandingPage = async (req, res) => {
+  const { city } = req.params;
+  console.log(city);
+  const result = await fetch(
+    `https://api.yelp.com/v3/businesses/search?location="+"${city}"&limit=50`,
+    {
+      mode: "no-cors",
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + process.env.API_KEY,
+      },
+      credentials: "same-origin",
+    }
+  );
+  const data = await result.json();
+  res.json(data);
 };
 
 module.exports.getOne = (req, res) => {
