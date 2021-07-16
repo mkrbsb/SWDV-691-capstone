@@ -1,19 +1,23 @@
-const express = require('express')
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
+const auth = require("../middleware/auth");
 
-const {getAll, getOne, dislike, like, deleteOne} = require('../controller/restaurants-controller')
+const {
+  getAll,
+  getOne,
+  dislike,
+  like,
+  deleteOne,
+} = require("../controller/restaurants-controller");
 
+router.get("/restaurants", getAll);
 
-router.get("/restaurants", getAll)
+router.get("/restaurants/:restaurantId", getOne);
 
-router.get("/restaurants/:restaurantId", getOne)
+router.post("/restaurants/like/:userId", auth, like);
 
-router.post("/restaurants/like/:userId", like)
+router.post("/restaurants/dislike/:userId", auth, dislike);
 
-router.post("/restaurants/dislike/:userId", dislike)
+router.delete("/restaurants/:restaurantId", deleteOne);
 
-router.delete("/restaurants/:restaurantId", deleteOne)
-
-
-module.exports = router
-
+module.exports = router;
