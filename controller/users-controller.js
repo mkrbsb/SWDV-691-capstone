@@ -17,6 +17,7 @@ module.exports.create = async (req, res, next) => {
   const vPassword = req.body.vPassword;
 
   if (password !== vPassword) {
+    res.status(400).json({ err: { email: "Password doesnt match" } });
     return;
   }
   const user = await User.findOne({ email });
@@ -39,16 +40,17 @@ module.exports.create = async (req, res, next) => {
     state: req.body.state,
     zipcode: req.body.zipcode,
   });
-  const result = await newUser.save().catch((err) => console.log(err));
+  console.log(newUser);
+  // const result = await newUser.save().catch((err) => console.log(err));
 
-  const newWidget = new Widget({
-    _id: result._id,
-  });
+  // const newWidget = new Widget({
+  //   _id: result._id,
+  // });
 
-  await newWidget.save().catch((err) => console.log(err));
+  // await newWidget.save().catch((err) => console.log(err));
 
-  // send back user and token
-  create_user_login(req, res, result);
+  // // send back user and token
+  // create_user_login(req, res, result);
 };
 
 module.exports.update = async (req, res) => {
