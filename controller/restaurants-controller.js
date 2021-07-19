@@ -1,5 +1,6 @@
 const Restaurant = require("../model/restaurants-model");
 const fetch = require("node-fetch");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 module.exports.getAll = async (req, res) => {
@@ -62,8 +63,11 @@ module.exports.getOne = (req, res) => {
 };
 
 module.exports.dislike = async (req, res) => {
-  const userId = req.params.userId;
+  const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET);
+  const userId = decoded.user;
   const id = req.body.id;
+  const likes = [];
+  const dislikes = [];
   const restaurant = await Restaurant.findById({ _id: id }).catch((err) =>
     console.log(err)
   );
@@ -81,18 +85,79 @@ module.exports.dislike = async (req, res) => {
           (like) => like.user.toString() === userId
         );
         restaurant.likes.splice(index, 1);
-        restaurant.save();
+        await restaurant.save();
+        Restaurant.find({}, (err, data) => {
+          if (err) {
+            return;
+          }
+
+          data.forEach((obj) => {
+            obj.likes.forEach((like) => {
+              if (like.user.toString() === userId) {
+                likes.push({ [obj._id]: like.user });
+              }
+            });
+          });
+          data.forEach((obj) => {
+            obj.dislikes.forEach((dislike) => {
+              if (dislike.user.toString() === userId) {
+                dislikes.push({ [obj._id]: dislike.user });
+              }
+            });
+          });
+          res.json({ likes, dislikes });
+        });
       }
       const index = restaurant.dislikes.findIndex(
         (dislike) => dislike.user.toString() === userId
       );
       restaurant.dislikes.splice(index, 1);
-      restaurant.save();
-      res.json({ message: "Restaurant dislike removed" });
+      await restaurant.save();
+      Restaurant.find({}, (err, data) => {
+        if (err) {
+          return;
+        }
+
+        data.forEach((obj) => {
+          obj.likes.forEach((like) => {
+            if (like.user.toString() === userId) {
+              likes.push({ [obj._id]: like.user });
+            }
+          });
+        });
+        data.forEach((obj) => {
+          obj.dislikes.forEach((dislike) => {
+            if (dislike.user.toString() === userId) {
+              dislikes.push({ [obj._id]: dislike.user });
+            }
+          });
+        });
+        res.json({ likes, dislikes });
+      });
     } else {
       restaurant.dislikes.unshift({ user: userId });
-      restaurant.save();
-      res.json({ message: "Restaurant dislike saved" });
+      await restaurant.save();
+      Restaurant.find({}, (err, data) => {
+        if (err) {
+          return;
+        }
+
+        data.forEach((obj) => {
+          obj.likes.forEach((like) => {
+            if (like.user.toString() === userId) {
+              likes.push({ [obj._id]: like.user });
+            }
+          });
+        });
+        data.forEach((obj) => {
+          obj.dislikes.forEach((dislike) => {
+            if (dislike.user.toString() === userId) {
+              dislikes.push({ [obj._id]: dislike.user });
+            }
+          });
+        });
+        res.json({ likes, dislikes });
+      });
     }
   } else {
     const newRestaurant = new Restaurant({
@@ -103,13 +168,36 @@ module.exports.dislike = async (req, res) => {
     const data = await newRestaurant
       .save()
       .catch((error) => res.json({ err: { message: error } }));
-    res.json(data);
+    Restaurant.find({}, (err, data) => {
+      if (err) {
+        return;
+      }
+
+      data.forEach((obj) => {
+        obj.likes.forEach((like) => {
+          if (like.user.toString() === userId) {
+            likes.push({ [obj._id]: like.user });
+          }
+        });
+      });
+      data.forEach((obj) => {
+        obj.dislikes.forEach((dislike) => {
+          if (dislike.user.toString() === userId) {
+            dislikes.push({ [obj._id]: dislike.user });
+          }
+        });
+      });
+      res.json({ likes, dislikes });
+    });
   }
 };
 
 module.exports.like = async (req, res) => {
-  const userId = req.params.userId;
+  const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET);
+  const userId = decoded.user;
   const id = req.body.id;
+  const likes = [];
+  const dislikes = [];
   const restaurant = await Restaurant.findById({ _id: id }).catch((err) =>
     console.log(err)
   );
@@ -127,29 +215,110 @@ module.exports.like = async (req, res) => {
           (dislike) => dislike.user.toString() === userId
         );
         restaurant.dislikes.splice(index, 1);
-        restaurant.save();
+        await restaurant.save();
+        Restaurant.find({}, (err, data) => {
+          if (err) {
+            return;
+          }
+
+          data.forEach((obj) => {
+            obj.likes.forEach((like) => {
+              if (like.user.toString() === userId) {
+                likes.push({ [obj._id]: like.user });
+              }
+            });
+          });
+          data.forEach((obj) => {
+            obj.dislikes.forEach((dislike) => {
+              if (dislike.user.toString() === userId) {
+                dislikes.push({ [obj._id]: dislike.user });
+              }
+            });
+          });
+          res.json({ likes, dislikes });
+        });
       }
       const index = restaurant.likes.findIndex(
         (like) => like.user.toString() === userId
       );
       restaurant.likes.splice(index, 1);
-      restaurant.save();
-      res.json({ message: "Restaurant like removed" });
+      await restaurant.save();
+      Restaurant.find({}, (err, data) => {
+        if (err) {
+          return;
+        }
+
+        data.forEach((obj) => {
+          obj.likes.forEach((like) => {
+            if (like.user.toString() === userId) {
+              likes.push({ [obj._id]: like.user });
+            }
+          });
+        });
+        data.forEach((obj) => {
+          obj.dislikes.forEach((dislike) => {
+            if (dislike.user.toString() === userId) {
+              dislikes.push({ [obj._id]: dislike.user });
+            }
+          });
+        });
+        res.json({ likes, dislikes });
+      });
     } else {
       restaurant.likes.unshift({ user: userId });
-      restaurant.save();
-      res.json({ message: "Restaurant like saved" });
+      await restaurant.save();
+      Restaurant.find({}, (err, data) => {
+        if (err) {
+          return;
+        }
+
+        data.forEach((obj) => {
+          obj.likes.forEach((like) => {
+            if (like.user.toString() === userId) {
+              likes.push({ [obj._id]: like.user });
+            }
+          });
+        });
+        data.forEach((obj) => {
+          obj.dislikes.forEach((dislike) => {
+            if (dislike.user.toString() === userId) {
+              dislikes.push({ [obj._id]: dislike.user });
+            }
+          });
+        });
+        res.json({ likes, dislikes });
+      });
     }
   } else {
     const newRestaurant = new Restaurant({
       _id: req.body.id,
-      data: req.body,
+      data: req.body.data,
       likes: [{ user: userId }],
     });
     const data = await newRestaurant
       .save()
       .catch((error) => res.json({ err: { message: error } }));
-    res.json(data);
+    Restaurant.find({}, (err, data) => {
+      if (err) {
+        return;
+      }
+
+      data.forEach((obj) => {
+        obj.likes.forEach((like) => {
+          if (like.user.toString() === userId) {
+            likes.push({ [obj._id]: like.user });
+          }
+        });
+      });
+      data.forEach((obj) => {
+        obj.dislikes.forEach((dislike) => {
+          if (dislike.user.toString() === userId) {
+            dislikes.push({ [obj._id]: dislike.user });
+          }
+        });
+      });
+      res.json({ likes, dislikes });
+    });
   }
 };
 

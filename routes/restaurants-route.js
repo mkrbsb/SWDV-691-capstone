@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth");
+const { auth } = require("../middleware/auth");
 
 const {
   getAll,
@@ -17,9 +17,9 @@ router.get("/restaurants/landingpage/:city", LandingPage);
 
 router.get("/restaurants/:restaurantId", getOne);
 
-router.post("/restaurants/like/:userId", auth, like);
+router.post("/restaurants/like", auth, like);
 
-router.post("/restaurants/dislike/:userId", auth, dislike);
+router.post("/restaurants/dislike", auth, dislike);
 
 router.delete("/restaurants/:restaurantId", deleteOne);
 

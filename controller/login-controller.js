@@ -12,55 +12,36 @@ module.exports.login = (req, res) => {
       return;
     }
     if (await bcrypt.compare(password, user.password)) {
-      const token = jwt.sign(
-        {
-          exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60,
-          data: process.env.JWT_SECRET,
-        },
-        "secret"
-      );
+      const token = jwt.sign({ user: user._id }, process.env.JWT_SECRET);
 
-      return res.json({ token: token });
+      return res.json({ token: token, isAuthenticated: true, user });
     }
     res.json({ err: { password: "password is incorrect" } });
   });
 };
 
-module.exports.verify = (req, res) => {
-  const token = req.headers.token;
+module.exports.verify = async (req, res) => {
+  const token = req.body.token;
 
-  User.findOne({ email }, async (err, user) => {
-    if (err) {
-      return;
-    }
-    if (await bcrypt.compare(password, user.password)) {
-      const token = jwt.sign(
-        {
-          exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60,
-          data: process.env.JWT_SECRET,
-        },
-        "secret"
-      );
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findOne({ _id: decoded.user });
 
-      return res.json({ token: token });
-    }
-    res.json({ err: { password: "password is incorrect" } });
-  });
+    res.json({ token: token, user, isAuthenticated: true });
+  } catch (err) {
+    // err
+    console.log(err);
+    res.json({ errors: { token: "Token is invalid" } });
+  }
 };
 
 module.exports.create_user_login = (req, res, user) => {
   const newUser = user;
-  const token = jwt.sign(
-    {
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60,
-      data: process.env.JWT_SECRET,
-    },
-    "secret"
-  );
+  const token = jwt.sign({ user: user._id }, process.env.JWT_SECRET);
 
   newUser.password = "";
 
-  return res.json({ token: token, User: newUser });
+  return res.json({ token: token, user: newUser, isAuthenticated: true });
 };
 
 module.exports.logout = (req, res) => {
