@@ -67,7 +67,7 @@ const UserSchema = new Schema({
     lowercase: true,
     trim: true,
   },
-  State: {
+  state: {
     type: String,
     min: 2,
     max: 26,

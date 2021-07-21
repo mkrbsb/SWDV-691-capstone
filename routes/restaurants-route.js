@@ -9,6 +9,7 @@ const {
   like,
   deleteOne,
   LandingPage,
+  getStatus,
 } = require("../controller/restaurants-controller");
 
 router.get("/restaurants", getAll);
@@ -16,6 +17,8 @@ router.get("/restaurants", getAll);
 router.get("/restaurants/landingpage/:city", LandingPage);
 
 router.get("/restaurants/:restaurantId", getOne);
+
+router.post("/restaurants/status", auth, getStatus);
 
 router.post("/restaurants/like", auth, like);
 

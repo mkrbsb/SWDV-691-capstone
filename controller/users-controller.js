@@ -44,7 +44,7 @@ module.exports.create = async (req, res, next) => {
   const result = await newUser.save().catch((err) => console.log(err));
 
   const newWidget = new Widget({
-    _id: result._id,
+    id: result._id,
   });
 
   await newWidget.save().catch((err) => console.log(err));
