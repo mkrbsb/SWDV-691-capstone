@@ -4,7 +4,6 @@ const User = require("../model/users-model");
 require("dotenv").config();
 
 module.exports.login = (req, res) => {
-  console.log(req.body);
   const password = req.body.password;
   const email = req.body.email;
 
@@ -12,12 +11,14 @@ module.exports.login = (req, res) => {
     if (err) {
       return;
     }
-    if (await bcrypt.compare(password, user.password)) {
-      const token = jwt.sign({ user: user._id }, process.env.JWT_SECRET);
+    if (user) {
+      if (await bcrypt.compare(password, user.password)) {
+        const token = jwt.sign({ user: user._id }, process.env.JWT_SECRET);
 
-      return res.json({ token: token, isAuthenticated: true, user });
+        return res.json({ token: token, isAuthenticated: true, user });
+      }
+      res.json({ err: { password: "password is incorrect" } });
     }
-    res.json({ err: { password: "password is incorrect" } });
   });
 };
 

@@ -3,6 +3,7 @@ const Roles = require("../model/roles-model");
 const Widget = require("../model/widget-model");
 const bcrypt = require("bcrypt");
 const { create_user_login } = require("../controller/login-controller");
+const jwt = require("jsonwebtoken");
 
 const saltRounds = 10;
 
@@ -54,24 +55,28 @@ module.exports.create = async (req, res, next) => {
 };
 
 module.exports.update = async (req, res) => {
-  const id = req.params.userId;
-  if (req.body.email) {
-    User.findOne({ email: req.body.email }, (err, user) => {
+  const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET);
+  const userId = decoded.user;
+
+  if (userId) {
+    User.findOne({ _id: userId }, (err, user) => {
+      console.log(user);
       if (user) {
-        res.status(400).json({ err: { email: "email account already used" } });
+        res.status(400).json({ err: { email: "No user found" } });
         return;
       }
-      User.updateOne(
-        { _id: id },
-        { ...req.body },
-        { new: true },
-        (err, result) => {
-          if (err) {
-            console.log(err);
-          }
-          res.json({ user: "user updated" });
-        }
-      );
+      console.log(user);
+      // User.updateOne(
+      //   { _id: user._id },
+      //   { ...req.body.user },
+      //   { new: true },
+      //   (err, result) => {
+      //     if (err) {
+      //       console.log(err);
+      //     }
+      //     res.json({ message: "user updated" });
+      //   }
+      // );
     });
   }
 };
