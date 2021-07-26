@@ -81,7 +81,6 @@ module.exports.update = async (req, res) => {
             }
 
             delete updateUser.vPassword;
-            console.log(updateUser);
             User.updateOne(
                 { _id: user._id },
                 { ...updateUser },
