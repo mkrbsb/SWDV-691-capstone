@@ -52,7 +52,6 @@ module.exports.getAll = async (req, res) => {
                 }
             );
             const data = await res.json();
-            console.log(data);
             return { [num]: data.businesses };
         })
     );
